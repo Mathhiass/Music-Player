@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { PuzzlePiece, generatePieces, checkComplete, calcScore } from '@/lib/puzzle/engine'
+import type { Song } from './playerStore'
 
 interface PuzzleState {
   isOpen: boolean
@@ -12,6 +13,7 @@ interface PuzzleState {
   closePuzzle: () => void
   placePiece: (pieceId: number, row: number, col: number) => void
   removePiece: (pieceId: number) => void
+  savePuzzleScore: (completionMs: number, score: number, gridSize: number) => Promise<void>
 }
 
 export const usePuzzleStore = create<PuzzleState>((set, get) => ({
@@ -29,7 +31,6 @@ export const usePuzzleStore = create<PuzzleState>((set, get) => ({
 
   placePiece: (pieceId, row, col) => {
     const { pieces, startTime, gridSize } = get()
-    // Evict any piece already in that cell
     const updated = pieces.map(p => {
       if (p.currentRow === row && p.currentCol === col && p.id !== pieceId)
         return { ...p, currentRow: -1, currentCol: -1, isPlaced: false }
@@ -49,7 +50,8 @@ export const usePuzzleStore = create<PuzzleState>((set, get) => ({
   })),
 
   savePuzzleScore: async (completionMs: number, score: number, gridSize: number) => {
-    const songId = (await import('@/store/playerStore')).usePlayerStore.getState().currentSong?.id
+    const player = await import('./playerStore')
+    const songId = player.usePlayerStore.getState().currentSong?.id
     if (!songId) return
     await fetch('/api/scores', {
       method: 'POST',
@@ -57,4 +59,4 @@ export const usePuzzleStore = create<PuzzleState>((set, get) => ({
       body: JSON.stringify({ songId, completionMs, score, gridSize }),
     })
   },
-} as any))
+}))

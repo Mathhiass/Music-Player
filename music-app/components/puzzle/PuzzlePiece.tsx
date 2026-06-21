@@ -1,60 +1,43 @@
-import { create } from 'zustand'
-import { PuzzlePiece, generatePieces, checkComplete, calcScore } from '@/lib/puzzle/engine'
+'use client'
+import { useDraggable } from '@dnd-kit/core'
+import { getPieceClipPath } from '@/lib/puzzle/engine'
+import type { PuzzlePiece as TPiece } from '@/lib/puzzle/engine'
 
-interface PuzzleState {
-  isOpen: boolean
+interface Props {
+  piece: TPiece
+  artworkUrl: string
+  pieceSize: number
   gridSize: number
-  pieces: PuzzlePiece[]
-  startTime: number | null
-  completionMs: number | null
-  score: number | null
-  openPuzzle: (gridSize?: number) => void
-  closePuzzle: () => void
-  placePiece: (pieceId: number, row: number, col: number) => void
-  removePiece: (pieceId: number) => void
+  inTray?: boolean
 }
 
-export const usePuzzleStore = create<PuzzleState>((set, get) => ({
-  isOpen: false,
-  gridSize: 3,
-  pieces: [],
-  startTime: null,
-  completionMs: null,
-  score: null,
+export function PuzzlePiece({ piece, artworkUrl, pieceSize, gridSize, inTray = false }: Props) {
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+    id: piece.id,
+    data: { piece },
+  })
 
-  openPuzzle: (gridSize = 3) =>
-    set({ isOpen: true, gridSize, pieces: generatePieces(gridSize), startTime: Date.now(), completionMs: null, score: null }),
+  const { clipPath, backgroundPosition, backgroundSize } = getPieceClipPath(
+    piece.correctRow, piece.correctCol, gridSize, pieceSize
+  )
 
-  closePuzzle: () => set({ isOpen: false }),
+  const style: React.CSSProperties = {
+    width: pieceSize,
+    height: pieceSize,
+    backgroundImage: `url(${artworkUrl})`,
+    backgroundSize,
+    backgroundPosition,
+    clipPath,
+    cursor: isDragging ? 'grabbing' : 'grab',
+    opacity: isDragging ? 0.5 : 1,
+    transform: transform ? `translate(${transform.x}px, ${transform.y}px)` : undefined,
+    transition: isDragging ? 'none' : 'transform 0.15s ease, box-shadow 0.15s ease',
+    boxShadow: isDragging ? '0 8px 24px rgba(0,0,0,0.4)' : '0 2px 8px rgba(0,0,0,0.2)',
+    borderRadius: 4,
+    userSelect: 'none',
+    zIndex: isDragging ? 999 : 'auto',
+    position: 'relative',
+  }
 
-  placePiece: (pieceId, row, col) => {
-    const { pieces, startTime, gridSize } = get()
-    // Evict any piece already in that cell
-    const updated = pieces.map(p => {
-      if (p.currentRow === row && p.currentCol === col && p.id !== pieceId)
-        return { ...p, currentRow: -1, currentCol: -1, isPlaced: false }
-      if (p.id === pieceId)
-        return { ...p, currentRow: row, currentCol: col, isPlaced: true }
-      return p
-    })
-    const complete = checkComplete(updated)
-    const completionMs = complete ? Date.now() - (startTime ?? 0) : null
-    const score = complete ? calcScore(completionMs!, gridSize) : null
-    set({ pieces: updated, completionMs, score })
-    if (complete) get().savePuzzleScore(completionMs!, score!, gridSize)
-  },
-
-  removePiece: (pieceId) => set(s => ({
-    pieces: s.pieces.map(p => p.id === pieceId ? { ...p, currentRow: -1, currentCol: -1, isPlaced: false } : p)
-  })),
-
-  savePuzzleScore: async (completionMs: number, score: number, gridSize: number) => {
-    const songId = (await import('@/store/playerStore')).usePlayerStore.getState().currentSong?.id
-    if (!songId) return
-    await fetch('/api/scores', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ songId, completionMs, score, gridSize }),
-    })
-  },
-} as any))
+  return <div ref={setNodeRef} style={style} {...listeners} {...attributes} />
+}

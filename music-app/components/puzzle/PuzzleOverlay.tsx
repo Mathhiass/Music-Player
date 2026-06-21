@@ -45,3 +45,15 @@ export function PuzzleBoard({ artworkUrl, gridSize, pieceSize }: Props) {
     </div>
   )
 }
+
+export function PuzzleOverlay() {
+  const isOpen = usePuzzleStore(s => s.isOpen)
+  if (!isOpen) return null
+  return (
+    <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 60 }}>
+      <div style={{ width: 640, maxWidth: '90%', background: 'rgba(0,0,0,0.8)', padding: 20, borderRadius: 8 }}>
+        <p style={{ color: 'white', margin: 0 }}>Puzzle overlay</p>
+      </div>
+    </div>
+  )
+}

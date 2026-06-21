@@ -1,31 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db/prisma'
 
-export async function GET(req: NextRequest) {
-  const q = req.nextUrl.searchParams.get('q')
-  const limit = Number(req.nextUrl.searchParams.get('limit') ?? 20)
-  const offset = Number(req.nextUrl.searchParams.get('offset') ?? 0)
+export async function GET(req: NextRequest, context: { params: { id: string } | Promise<{ id: string }> }) {
+  const params = await context.params
+  const song = await prisma.song.findUnique({ where: { id: params.id } })
+  if (!song) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
-  const where = q
-    ? {
-        OR: [
-          { title: { contains: q, mode: 'insensitive' as const } },
-          { artist: { name: { contains: q, mode: 'insensitive' as const } } },
-          { album: { title: { contains: q, mode: 'insensitive' as const } } },
-        ],
-      }
-    : {}
+  const headers: Record<string, string> = {}
+  const range = req.headers.get('range')
+  if (range) headers['range'] = range
 
-  const [songs, total] = await Promise.all([
-    prisma.song.findMany({
-      where,
-      include: { artist: true, album: true },
-      take: limit,
-      skip: offset,
-      orderBy: { title: 'asc' },
-    }),
-    prisma.song.count({ where }),
-  ])
+  const upstream = await fetch(song.audioUrl, { headers })
 
-  return NextResponse.json({ songs, total, limit, offset })
+  return new NextResponse(upstream.body, {
+    status: upstream.status,
+    headers: {
+      'Content-Type': upstream.headers.get('Content-Type') ?? 'audio/mpeg',
+      'Content-Length': upstream.headers.get('Content-Length') ?? '',
+      'Content-Range': upstream.headers.get('Content-Range') ?? '',
+      'Accept-Ranges': 'bytes',
+      'Cache-Control': 'public, max-age=3600',
+    },
+  })
 }

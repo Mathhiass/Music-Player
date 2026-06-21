@@ -30,7 +30,7 @@ export function PlayerBar() {
           {currentSong.title}
         </p>
         <p style={{ margin: 0, fontSize: 12, color: 'var(--color-text-secondary)' }}>
-          {currentSong.artist.name}
+          {currentSong.artist?.name ?? ''}
         </p>
       </div>
 

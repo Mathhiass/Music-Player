@@ -1,23 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyToken } from '@/lib/auth/jwt'
+import { prisma } from '@/lib/db/prisma'
 
-const PUBLIC = ['/login', '/register', '/api/auth']
+export async function GET(req: NextRequest) {
+  const q = req.nextUrl.searchParams.get('q')
+  const limit = Number(req.nextUrl.searchParams.get('limit') ?? 20)
+  const offset = Number(req.nextUrl.searchParams.get('offset') ?? 0)
 
-export async function middleware(req: NextRequest) {
-  const isPublic = PUBLIC.some(p => req.nextUrl.pathname.startsWith(p))
-  if (isPublic) return NextResponse.next()
+  const where = q
+    ? {
+        OR: [
+          { title: { contains: q, mode: 'insensitive' as const } },
+          { artist: { name: { contains: q, mode: 'insensitive' as const } } },
+          { album: { title: { contains: q, mode: 'insensitive' as const } } },
+        ],
+      }
+    : {}
 
-  const token = req.cookies.get('token')?.value
-  if (!token) return NextResponse.redirect(new URL('/login', req.url))
+  const [songs, total] = await Promise.all([
+    prisma.song.findMany({
+      where,
+      include: { artist: true, album: true },
+      take: limit,
+      skip: offset,
+      orderBy: { title: 'asc' },
+    }),
+    prisma.song.count({ where }),
+  ])
 
-  try {
-    const payload = await verifyToken(token)
-    const res = NextResponse.next()
-    res.headers.set('x-user-id', payload.userId)
-    return res
-  } catch {
-    return NextResponse.redirect(new URL('/login', req.url))
-  }
+  return NextResponse.json({ songs, total, limit, offset })
 }
-
-export const config = { matcher: ['/((?!_next|favicon.ico).*)'] }
