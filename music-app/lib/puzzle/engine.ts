@@ -1,46 +1,43 @@
-import { create } from 'zustand'
-
-interface Song { id: string; title: string; artworkUrl?: string; audioUrl: string; artist: { name: string } }
-
-interface PlayerState {
-  currentSong: Song | null
-  queue: Song[]
-  queueIndex: number
-  isPlaying: boolean
-  progress: number
-  duration: number
-  volume: number
-  playSong: (song: Song, queue?: Song[]) => void
-  playNext: () => void
-  playPrev: () => void
-  setIsPlaying: (v: boolean) => void
-  setProgress: (v: number) => void
-  setDuration: (v: number) => void
-  setVolume: (v: number) => void
+export type PuzzlePiece = {
+  id: number
+  correctRow: number
+  correctCol: number
+  currentRow: number
+  currentCol: number
+  isPlaced: boolean
 }
 
-export const usePlayerStore = create<PlayerState>((set, get) => ({
-  currentSong: null,
-  queue: [],
-  queueIndex: 0,
-  isPlaying: false,
-  progress: 0,
-  duration: 0,
-  volume: 0.8,
-  playSong: (song, queue = [song]) =>
-    set({ currentSong: song, queue, queueIndex: queue.indexOf(song), isPlaying: true }),
-  playNext: () => {
-    const { queue, queueIndex } = get()
-    const next = queueIndex + 1
-    if (next < queue.length) set({ currentSong: queue[next], queueIndex: next, isPlaying: true })
-  },
-  playPrev: () => {
-    const { queue, queueIndex } = get()
-    const prev = queueIndex - 1
-    if (prev >= 0) set({ currentSong: queue[prev], queueIndex: prev, isPlaying: true })
-  },
-  setIsPlaying: v => set({ isPlaying: v }),
-  setProgress: v => set({ progress: v }),
-  setDuration: v => set({ duration: v }),
-  setVolume: v => set({ volume: v }),
-}))
+export function generatePieces(gridSize: number): PuzzlePiece[] {
+  const pieces: PuzzlePiece[] = []
+  let id = 0
+  for (let r = 0; r < gridSize; r++) {
+    for (let c = 0; c < gridSize; c++) {
+      pieces.push({ id: id++, correctRow: r, correctCol: c, currentRow: -1, currentCol: -1, isPlaced: false })
+    }
+  }
+  // shuffle order so tray is randomized
+  for (let i = pieces.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[pieces[i], pieces[j]] = [pieces[j], pieces[i]]
+  }
+  return pieces
+}
+
+export function checkComplete(pieces: PuzzlePiece[]) {
+  return pieces.every(p => p.isPlaced && p.currentRow === p.correctRow && p.currentCol === p.correctCol)
+}
+
+export function calcScore(completionMs: number, gridSize: number) {
+  const timeSec = Math.max(1, completionMs / 1000)
+  const base = 1000 * gridSize
+  return Math.max(0, Math.round(base / timeSec))
+}
+
+export function getPieceClipPath(correctRow: number, correctCol: number, gridSize: number, pieceSize: number) {
+  // background positioning to show the correct crop of the artwork
+  const backgroundSize = `${gridSize * pieceSize}px ${gridSize * pieceSize}px`
+  const backgroundPosition = `-${correctCol * pieceSize}px -${correctRow * pieceSize}px`
+  // use a simple rectangular clip (inset) — components style rounding separately
+  const clipPath = `inset(0px)`
+  return { clipPath, backgroundPosition, backgroundSize }
+}

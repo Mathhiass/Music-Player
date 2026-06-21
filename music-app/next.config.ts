@@ -1,3 +1,4 @@
+import path from 'path'
 import type { NextConfig } from 'next'
 
 const config: NextConfig = {
@@ -12,6 +13,10 @@ const config: NextConfig = {
         hostname: 'i.scdn.co', // If using Spotify artwork
       },
     ],
+  },
+  turbopack: {
+    // ensure Turbopack resolves the project root to this app directory
+    root: path.resolve(__dirname),
   },
   async headers() {
     return [

@@ -1,17 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import bcrypt from 'bcryptjs'
-import { prisma } from '@/lib/db/prisma'
-import { signToken } from '@/lib/auth/jwt'
 
-export async function POST(req: NextRequest) {
-  const { email, password } = await req.json()
-  const user = await prisma.user.findUnique({ where: { email } })
-
-  if (!user || !(await bcrypt.compare(password, user.passwordHash)))
-    return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 })
-
-  const token = await signToken({ userId: user.id, email: user.email })
-  const res = NextResponse.json({ user: { id: user.id, email: user.email, username: user.username } })
-  res.cookies.set('token', token, { httpOnly: true, secure: true, sameSite: 'lax', maxAge: 604800 })
-  return res
+export function middleware(req: NextRequest) {
+  // passthrough middleware — keep for future edge-handling (CORS, logging, etc.)
+  return NextResponse.next()
 }
