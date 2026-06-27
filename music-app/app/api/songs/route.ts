@@ -1,31 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/db/prisma'
 
 export async function GET(req: NextRequest) {
-  const q = req.nextUrl.searchParams.get('q')
+  const q = req.nextUrl.searchParams.get('q') || 'lofi'
   const limit = Number(req.nextUrl.searchParams.get('limit') ?? 20)
-  const offset = Number(req.nextUrl.searchParams.get('offset') ?? 0)
+  
+  const discoveryNode = 'https://discoveryprovider.audius.co'
+  
+  try {
+    const res = await fetch(`${discoveryNode}/v1/tracks/search?query=${encodeURIComponent(q)}`)
+    const data = await res.json()
+    
+    // Map Audius track structure to our app's Song model
+    const songs = (data.data || []).slice(0, limit).map((track: any) => ({
+      id: track.id,
+      title: track.title,
+      audioUrl: `${discoveryNode}/v1/tracks/${track.id}/stream`,
+      artworkUrl: track.artwork?.['480x480'] || track.artwork?.['150x150'] || '/placeholder.png',
+      durationSeconds: track.duration || 180,
+      artist: { name: track.user?.name || 'Unknown Artist' },
+      album: { title: track.album?.title || 'Single' }
+    }))
 
-  const where = q
-    ? {
-        OR: [
-          { title: { contains: q, mode: 'insensitive' as const } },
-          { artist: { name: { contains: q, mode: 'insensitive' as const } } },
-          { album: { title: { contains: q, mode: 'insensitive' as const } } },
-        ],
-      }
-    : {}
-
-  const [songs, total] = await Promise.all([
-    prisma.song.findMany({
-      where,
-      include: { artist: true, album: true },
-      take: limit,
-      skip: offset,
-      orderBy: { title: 'asc' },
-    }),
-    prisma.song.count({ where }),
-  ])
-
-  return NextResponse.json({ songs, total, limit, offset })
+    return NextResponse.json({ songs })
+  } catch (err) {
+    console.error(err)
+    return NextResponse.json({ error: 'Failed to fetch from Audius API' }, { status: 500 })
+  }
 }

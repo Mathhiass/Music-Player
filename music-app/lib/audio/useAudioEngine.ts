@@ -3,7 +3,7 @@ import { usePlayerStore } from '@/store/playerStore'
 
 export function useAudioEngine() {
   const audioRef = useRef<HTMLAudioElement | null>(null)
-  const { currentSong, isPlaying, volume, setIsPlaying, setProgress, setDuration } = usePlayerStore()
+  const { currentSong, isPlaying, volume, setIsPlaying, setProgress, setDuration, setAudio } = usePlayerStore()
 
   useEffect(() => {
     if (!audioRef.current) {
@@ -11,6 +11,7 @@ export function useAudioEngine() {
       audioRef.current.preload = 'metadata'
     }
     const audio = audioRef.current
+    setAudio(audio)
 
     const onTimeUpdate = () => setProgress(audio.currentTime)
     const onLoaded = () => setDuration(audio.duration)
@@ -23,13 +24,14 @@ export function useAudioEngine() {
       audio.removeEventListener('timeupdate', onTimeUpdate)
       audio.removeEventListener('loadedmetadata', onLoaded)
       audio.removeEventListener('ended', onEnded)
+      setAudio(null)
     }
-  }, [])
+  }, [setAudio, setDuration, setIsPlaying, setProgress])
 
   useEffect(() => {
     const audio = audioRef.current
     if (!audio || !currentSong) return
-    audio.src = `/api/songs/${currentSong.id}/stream`
+    audio.src = currentSong.audioUrl
     audio.load()
     if (isPlaying) audio.play()
   }, [currentSong?.id])
