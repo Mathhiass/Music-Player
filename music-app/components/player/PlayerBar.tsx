@@ -82,7 +82,7 @@ export function PlayerBar() {
   return (
     <div className="fixed bottom-0 left-0 right-0 h-20 bg-[#08090c] border-t border-zinc-900/60 px-6 flex items-center justify-between z-50 shadow-2xl select-none">
       {/* Left: Song Info & Heart */}
-      <div className="flex items-center gap-3.5 min-w-[200px] max-w-[30%]">
+      <div className="flex items-center gap-3.5 w-1/4 min-w-[200px]">
         <button
           onClick={() => openPuzzle(3)}
           className="relative h-12 w-12 shrink-0 rounded-lg overflow-hidden border border-zinc-800 shadow-md group cursor-pointer"
@@ -93,34 +93,28 @@ export function PlayerBar() {
             <Puzzle className="h-4.5 w-4.5 text-white" />
           </div>
         </button>
-        <div className="min-w-0 flex items-center gap-3">
-          <div className="text-left">
-            <p className="font-bold text-zinc-100 text-xs truncate leading-tight">{currentSong.title}</p>
-            <p className="text-zinc-500 text-[10px] truncate mt-0.5 font-medium leading-none">{currentSong.artist?.name ?? 'Unknown Artist'}</p>
-          </div>
-          
-          <button
-            onClick={toggleLibrary}
-            className="cursor-pointer transition-transform hover:scale-105 active:scale-95 shrink-0"
-            title={isSaved ? "Remove from Library" : "Save to Library"}
-          >
-            <Heart className={`h-4.5 w-4.5 transition-colors ${isSaved ? 'text-indigo-500 fill-indigo-500' : 'text-zinc-500 hover:text-zinc-300'}`} />
-          </button>
+        <div className="min-w-0 flex flex-col items-start pr-2">
+          <p className="font-bold text-zinc-100 text-xs truncate w-full text-left">{currentSong.title}</p>
+          <p className="text-zinc-500 text-[10px] truncate mt-0.5 font-medium w-full text-left">{currentSong.artist?.name ?? 'Unknown Artist'}</p>
         </div>
+        <button
+          onClick={toggleLibrary}
+          className="cursor-pointer transition-transform hover:scale-105 active:scale-95 shrink-0 text-zinc-500 hover:text-zinc-300 ml-2"
+          title={isSaved ? "Remove from Library" : "Save to Library"}
+        >
+          <Heart className={`h-4.5 w-4.5 transition-colors ${isSaved ? 'text-indigo-500 fill-indigo-500' : ''}`} />
+        </button>
       </div>
 
       {/* Center: Controls + Seek Bar */}
       <div className="flex-1 max-w-xl px-4 flex flex-col items-center gap-1.5">
         <div className="flex items-center gap-4">
-          {/* Shuffle */}
           <button className="cursor-pointer text-zinc-500 hover:text-zinc-200 transition-colors" title="Shuffle">
             <Shuffle className="h-4 w-4" />
           </button>
 
-          {/* Core Controls (SkipBack, Play/Pause, SkipForward) */}
           <PlayerControls />
 
-          {/* Repeat */}
           <button className="cursor-pointer text-zinc-500 hover:text-zinc-200 transition-colors" title="Repeat">
             <Repeat className="h-4 w-4" />
           </button>
@@ -142,18 +136,15 @@ export function PlayerBar() {
       </div>
 
       {/* Right: Actions */}
-      <div className="flex items-center gap-4 min-w-[200px] max-w-[30%] justify-end text-sm">
-        {/* Lyrics Icon */}
+      <div className="flex items-center gap-4 w-1/4 min-w-[200px] justify-end text-sm">
         <button className="text-zinc-500 hover:text-zinc-300 transition-colors cursor-pointer" title="Lyrics">
           <Mic className="h-4 w-4" />
         </button>
 
-        {/* Queue Icon */}
         <button className="text-zinc-500 hover:text-zinc-300 transition-colors cursor-pointer" title="Queue">
           <ListMusic className="h-4 w-4" />
         </button>
 
-        {/* Device Connector */}
         <button className="text-zinc-500 hover:text-zinc-300 transition-colors cursor-pointer" title="Connect to device">
           <Laptop className="h-4 w-4" />
         </button>
