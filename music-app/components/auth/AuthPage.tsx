@@ -377,7 +377,7 @@ export default function AuthPage({ defaultTab }: { defaultTab: 'login' | 'regist
           <div className="grid grid-cols-2 gap-3">
             <button
               type="button"
-              onClick={() => window.location.href = '/api/auth/google/login'}
+              onClick={() => setError('Google login is coming soon!')}
               className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl border border-zinc-900 bg-[#101217] hover:bg-zinc-900/50 text-zinc-300 hover:text-white text-xs font-semibold transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
             >
               <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="h-4 w-4" alt="Google" />
@@ -385,7 +385,7 @@ export default function AuthPage({ defaultTab }: { defaultTab: 'login' | 'regist
             </button>
             <button
               type="button"
-              onClick={() => window.location.href = '/api/auth/apple/login'}
+              onClick={() => setError('Apple login is coming soon!')}
               className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl border border-zinc-900 bg-[#101217] hover:bg-zinc-900/50 text-zinc-300 hover:text-white text-xs font-semibold transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
             >
               <img src="https://www.svgrepo.com/show/475633/apple-color.svg" className="h-4 w-4" alt="Apple" />
