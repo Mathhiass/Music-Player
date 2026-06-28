@@ -200,7 +200,7 @@ export default function AuthPage({ defaultTab }: { defaultTab: 'login' | 'regist
             {/* Sign In Button */}
             <button
               onClick={() => handleTabChange('login')}
-              className={`z-10 flex-grow text-center py-2 text-xs font-bold transition-colors duration-300 cursor-pointer ${
+              className={`z-10 flex-1 text-center py-2 text-xs font-bold transition-colors duration-300 cursor-pointer ${
                 activeTab === 'login' ? 'text-white' : 'text-zinc-500 hover:text-zinc-300'
               }`}
             >
@@ -210,7 +210,7 @@ export default function AuthPage({ defaultTab }: { defaultTab: 'login' | 'regist
             {/* Create Account Button */}
             <button
               onClick={() => handleTabChange('register')}
-              className={`z-10 flex-grow text-center py-2 text-xs font-bold transition-colors duration-300 cursor-pointer ${
+              className={`z-10 flex-1 text-center py-2 text-xs font-bold transition-colors duration-300 cursor-pointer ${
                 activeTab === 'register' ? 'text-white' : 'text-zinc-500 hover:text-zinc-300'
               }`}
             >
