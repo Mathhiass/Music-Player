@@ -92,8 +92,8 @@ export default function PlayerHome() {
     (s.artist?.name || '').toLowerCase().includes(searchQuery.toLowerCase())
   )
 
-  // Use first song for Hero details
-  const heroSong = songs[0]
+  // Use currently playing song for Hero details, falling back to first song
+  const heroSong = currentSong || songs[0]
 
   const getInitials = (name: string) => {
     if (!name) return 'JD'
@@ -162,12 +162,18 @@ export default function PlayerHome() {
             {/* Metadata Text */}
             <div className="text-left space-y-2">
               <div className="flex items-center gap-2">
-                <span className="text-[9px] font-extrabold uppercase tracking-wider text-indigo-400 bg-indigo-900/40 border border-indigo-500/20 px-2 py-0.5 rounded-md">Featured Album</span>
-                <span className="text-[9px] font-extrabold uppercase tracking-wider text-emerald-400 bg-emerald-950/40 border border-emerald-800/20 px-2 py-0.5 rounded-md">Synthwave</span>
+                <span className="text-[9px] font-extrabold uppercase tracking-wider text-indigo-400 bg-indigo-900/40 border border-indigo-500/20 px-2 py-0.5 rounded-md">
+                  {currentSong?.id === heroSong.id ? 'Now Playing' : 'Featured Album'}
+                </span>
+                <span className="text-[9px] font-extrabold uppercase tracking-wider text-emerald-400 bg-emerald-950/40 border border-emerald-800/20 px-2 py-0.5 rounded-md">
+                  Synthwave
+                </span>
               </div>
               <h2 className="text-3xl font-extrabold tracking-tight text-white leading-none">{heroSong.title}</h2>
               <p className="text-sm font-semibold text-zinc-400">{heroSong.artist?.name || 'Unknown Artist'}</p>
-              <p className="text-[10px] text-zinc-500 font-medium">Midnight Memories • 2023 • 12.4M plays</p>
+              <p className="text-[10px] text-zinc-500 font-medium">
+                {heroSong.album?.title || 'Single'} • 2023 • 12.4M plays
+              </p>
 
               {/* Quick Actions Panel */}
               <div className="flex items-center gap-2 pt-1">
