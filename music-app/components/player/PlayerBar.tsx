@@ -13,7 +13,19 @@ const formatTime = (sec: number) => {
 }
 
 export function PlayerBar() {
-  const { currentSong, progress, duration, audio, volume, setVolume, setProgress } = usePlayerStore()
+  const { 
+    currentSong, 
+    progress, 
+    duration, 
+    audio, 
+    volume, 
+    setVolume, 
+    setProgress,
+    isShuffle,
+    toggleShuffle,
+    repeatMode,
+    toggleRepeatMode 
+  } = usePlayerStore()
   const openPuzzle = usePuzzleStore(s => s.openPuzzle)
   const [libraryIds, setLibraryIds] = useState<Set<string>>(new Set())
 
@@ -109,14 +121,29 @@ export function PlayerBar() {
       {/* Center: Controls + Seek Bar */}
       <div className="flex-1 max-w-xl px-4 flex flex-col items-center gap-1.5">
         <div className="flex items-center gap-4">
-          <button className="cursor-pointer text-zinc-500 hover:text-zinc-200 transition-colors" title="Shuffle">
+          <button 
+            onClick={toggleShuffle}
+            className={`cursor-pointer transition-colors p-1 rounded-full ${
+              isShuffle ? 'text-indigo-400 hover:text-indigo-300' : 'text-zinc-500 hover:text-zinc-200'
+            }`} 
+            title={isShuffle ? "Shuffle On" : "Shuffle Off"}
+          >
             <Shuffle className="h-4 w-4" />
           </button>
 
           <PlayerControls />
 
-          <button className="cursor-pointer text-zinc-500 hover:text-zinc-200 transition-colors" title="Repeat">
+          <button 
+            onClick={toggleRepeatMode}
+            className={`cursor-pointer transition-colors p-1 rounded-full relative ${
+              repeatMode !== 'off' ? 'text-indigo-400 hover:text-indigo-300' : 'text-zinc-500 hover:text-zinc-200'
+            }`} 
+            title={`Repeat Mode: ${repeatMode}`}
+          >
             <Repeat className="h-4 w-4" />
+            {repeatMode === 'one' && (
+              <span className="absolute -top-0.5 -right-0.5 bg-indigo-600 text-white rounded-full text-[6px] font-extrabold h-2.5 w-2.5 flex items-center justify-center border border-[#0d0e12]">1</span>
+            )}
           </button>
         </div>
 

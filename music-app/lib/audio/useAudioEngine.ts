@@ -15,7 +15,16 @@ export function useAudioEngine() {
 
     const onTimeUpdate = () => setProgress(audio.currentTime)
     const onLoaded = () => setDuration(audio.duration)
-    const onEnded = () => { setIsPlaying(false); usePlayerStore.getState().playNext() }
+    const onEnded = () => {
+      const { repeatMode, playNext } = usePlayerStore.getState()
+      if (repeatMode === 'one') {
+        audio.currentTime = 0
+        audio.play().catch(() => {})
+      } else {
+        setIsPlaying(false)
+        playNext()
+      }
+    }
 
     audio.addEventListener('timeupdate', onTimeUpdate)
     audio.addEventListener('loadedmetadata', onLoaded)
