@@ -40,7 +40,7 @@ export default function Library() {
     if (currentSong?.id === song.id) {
       setIsPlaying(!isPlaying)
     } else {
-      setCurrentSong(song)
+      setCurrentSong(song, songs)
       setIsPlaying(true)
     }
   }

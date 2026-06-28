@@ -72,7 +72,7 @@ export default function Search() {
     if (currentSong?.id === song.id) {
       setIsPlaying(!isPlaying)
     } else {
-      setCurrentSong(song)
+      setCurrentSong(song, results)
       setIsPlaying(true)
     }
   }

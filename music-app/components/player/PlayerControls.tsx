@@ -4,11 +4,15 @@ import { usePlayerStore } from '@/store/playerStore'
 import { Play, Pause, SkipBack, SkipForward } from 'lucide-react'
 
 export function PlayerControls() {
-  const { isPlaying, setIsPlaying } = usePlayerStore()
+  const { isPlaying, setIsPlaying, playNext, playPrevious } = usePlayerStore()
   return (
     <div className="flex items-center gap-4 shrink-0 select-none">
       {/* Skip Backward Button */}
-      <button className="text-zinc-400 hover:text-zinc-200 p-1.5 transition-colors cursor-pointer" title="Previous">
+      <button 
+        onClick={playPrevious}
+        className="text-zinc-400 hover:text-zinc-200 p-1.5 transition-colors cursor-pointer" 
+        title="Previous"
+      >
         <SkipBack className="h-5 w-5 fill-current" />
       </button>
 
@@ -26,7 +30,11 @@ export function PlayerControls() {
       </button>
 
       {/* Skip Forward Button */}
-      <button className="text-zinc-400 hover:text-zinc-200 p-1.5 transition-colors cursor-pointer" title="Next">
+      <button 
+        onClick={playNext}
+        className="text-zinc-400 hover:text-zinc-200 p-1.5 transition-colors cursor-pointer" 
+        title="Next"
+      >
         <SkipForward className="h-5 w-5 fill-current" />
       </button>
     </div>

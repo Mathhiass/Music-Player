@@ -76,7 +76,8 @@ export default function PlaylistPage() {
     if (currentSong?.id === song.id) {
       setIsPlaying(!isPlaying)
     } else {
-      setCurrentSong(song)
+      const playlistSongs = activePlaylist?.songs?.map((ps: any) => ps.song) || []
+      setCurrentSong(song, playlistSongs)
       setIsPlaying(true)
     }
   }

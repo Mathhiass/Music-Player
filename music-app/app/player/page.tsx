@@ -27,10 +27,11 @@ export default function PlayerHome() {
     fetch('/api/songs')
       .then(res => res.json())
       .then(data => {
-        setSongs(data.songs || [])
+        const loadedSongs = data.songs || []
+        setSongs(loadedSongs)
         setLoading(false)
-        if (data.songs?.length > 0 && !usePlayerStore.getState().currentSong) {
-          setCurrentSong(data.songs[0])
+        if (loadedSongs.length > 0 && !usePlayerStore.getState().currentSong) {
+          setCurrentSong(loadedSongs[0], loadedSongs)
         }
       })
       .catch(() => setLoading(false))
@@ -49,7 +50,7 @@ export default function PlayerHome() {
     if (currentSong?.id === song.id) {
       setIsPlaying(!isPlaying)
     } else {
-      setCurrentSong(song)
+      setCurrentSong(song, songs)
       setIsPlaying(true)
     }
   }
