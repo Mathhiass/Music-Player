@@ -193,7 +193,7 @@ export default function AuthPage({ defaultTab }: { defaultTab: 'login' | 'regist
             {/* Sliding Pill Indicator */}
             <div
               className={`absolute top-1 bottom-1 w-[calc(50%-4px)] bg-indigo-600 rounded-full shadow transition-all duration-300 ease-in-out ${
-                activeTab === 'login' ? 'left-1' : 'left-[calc(50%+3px)]'
+                activeTab === 'login' ? 'left-1' : 'left-1/2'
               }`}
             ></div>
 
