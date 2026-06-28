@@ -63,7 +63,7 @@ export default function PlayerLayout({ children }: { children: React.ReactNode }
     <AudioEngineProvider>
       <div className="flex h-screen bg-[#0d0e12] font-sans text-zinc-100 overflow-hidden select-none">
         {/* Sidebar */}
-        <aside className="w-60 bg-[#08090c] flex flex-col justify-between shrink-0 px-5 py-6 border-r border-zinc-900/60 overflow-y-auto scrollbar-none">
+        <aside className="hidden md:flex w-60 bg-[#08090c] flex-col justify-between shrink-0 px-5 py-6 border-r border-zinc-900/60 overflow-y-auto scrollbar-none">
           <div className="space-y-6">
             {/* Logo */}
             <div className="flex items-center gap-2.5 px-2">
@@ -186,9 +186,29 @@ export default function PlayerLayout({ children }: { children: React.ReactNode }
         </aside>
 
         {/* Main Content Area */}
-        <div className="flex flex-col flex-1 min-w-0 overflow-y-auto pb-28">
-          <main className="flex-1 p-8">{children}</main>
+        <div className="flex flex-col flex-1 min-w-0 overflow-y-auto pb-36 md:pb-28">
+          <main className="flex-1 p-4 md:p-8">{children}</main>
         </div>
+
+        {/* Mobile Bottom Navigation Bar */}
+        <nav className="fixed bottom-0 left-0 right-0 h-16 bg-[#08090c] border-t border-zinc-900/60 flex md:hidden items-center justify-around z-50 px-4 text-zinc-400">
+          {menuItems.map((item) => {
+            const isActive = pathname === item.path
+            const Icon = item.icon
+            return (
+              <Link
+                key={item.name}
+                href={item.path}
+                className={`flex flex-col items-center justify-center gap-1 flex-1 h-full py-1.5 transition-colors ${
+                  isActive ? 'text-indigo-400 font-bold' : 'text-zinc-500 hover:text-zinc-300'
+                }`}
+              >
+                <Icon className="h-5 w-5" />
+                <span className="text-[9px] font-bold tracking-tight">{item.name}</span>
+              </Link>
+            )
+          })}
+        </nav>
 
         {/* Global Player Components */}
         <PlayerBar />
