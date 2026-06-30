@@ -9,7 +9,12 @@ const getClient = () => {
   if (!connectionString) {
     throw new Error('DATABASE_URL is not set')
   }
-  const pool = new pg.Pool({ connectionString })
+  const pool = new pg.Pool({
+    connectionString,
+    ssl: connectionString.includes('sslmode=require') || connectionString.includes('neon.tech')
+      ? { rejectUnauthorized: false }
+      : undefined
+  })
   const adapter = new PrismaPg(pool)
   return new PrismaClient({ adapter })
 }
