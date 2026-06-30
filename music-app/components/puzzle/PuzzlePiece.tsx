@@ -17,13 +17,13 @@ export function PuzzlePiece({ piece, artworkUrl, pieceSize, gridSize, inTray = f
     data: { piece },
   })
 
-  const { clipPath, backgroundPosition, backgroundSize } = getPieceClipPath(
+  const { clipPath, backgroundPosition, backgroundSize, offset, totalSize } = getPieceClipPath(
     piece.correctRow, piece.correctCol, gridSize, pieceSize
   )
 
   const style: React.CSSProperties = {
-    width: pieceSize,
-    height: pieceSize,
+    width: totalSize,
+    height: totalSize,
     backgroundImage: `url(${artworkUrl})`,
     backgroundSize,
     backgroundPosition,
@@ -33,10 +33,11 @@ export function PuzzlePiece({ piece, artworkUrl, pieceSize, gridSize, inTray = f
     transform: transform ? `translate(${transform.x}px, ${transform.y}px)` : undefined,
     transition: isDragging ? 'none' : 'transform 0.15s ease, box-shadow 0.15s ease',
     boxShadow: isDragging ? '0 8px 24px rgba(0,0,0,0.4)' : '0 2px 8px rgba(0,0,0,0.2)',
-    borderRadius: 4,
     userSelect: 'none',
     zIndex: isDragging ? 999 : 'auto',
-    position: 'relative',
+    position: inTray ? 'relative' : 'absolute',
+    left: inTray ? undefined : -offset,
+    top: inTray ? undefined : -offset,
   }
 
   return <div ref={setNodeRef} style={style} {...listeners} {...attributes} />

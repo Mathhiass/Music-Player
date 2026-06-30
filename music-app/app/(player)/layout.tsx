@@ -14,6 +14,8 @@ export default function PlayerLayout({ children }: { children: React.ReactNode }
   const router = useRouter()
   const [username, setUsername] = useState<string>('')
   const openPuzzle = usePuzzleStore(s => s.openPuzzle)
+  const setTotalScore = usePuzzleStore(s => s.setTotalScore)
+  const totalScore = usePuzzleStore(s => s.totalScore)
   const currentSong = usePlayerStore(s => s.currentSong)
 
   useEffect(() => {
@@ -23,12 +25,15 @@ export default function PlayerLayout({ children }: { children: React.ReactNode }
         router.replace('/auth/login')
       })
       .then(data => {
-        if (data?.user) setUsername(data.user.username)
+        if (data?.user) {
+          setUsername(data.user.username)
+          setTotalScore(data.user.totalScore ?? 0)
+        }
       })
       .catch(() => {
         router.replace('/auth/login')
       })
-  }, [router])
+  }, [router, setTotalScore])
 
   const handleLogout = async () => {
     document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT'
@@ -170,7 +175,9 @@ export default function PlayerLayout({ children }: { children: React.ReactNode }
                 </div>
                 <div className="flex flex-col text-left min-w-0">
                   <span className="text-xs font-bold text-zinc-200 truncate">{username || 'Jamie Davis'}</span>
-                  <span className="text-[9px] text-zinc-500 font-semibold mt-0.5 uppercase tracking-wide">Premium</span>
+                  <span className="text-[9px] text-zinc-500 font-semibold mt-0.5 uppercase tracking-wide">
+                    Premium {totalScore !== null ? `• ${totalScore} pts` : ''}
+                  </span>
                 </div>
               </div>
 

@@ -9,11 +9,13 @@ interface PuzzleState {
   startTime: number | null
   completionMs: number | null
   score: number | null
+  totalScore: number | null
   openPuzzle: (gridSize?: number) => void
   closePuzzle: () => void
   placePiece: (pieceId: number, row: number, col: number) => void
   removePiece: (pieceId: number) => void
   savePuzzleScore: (completionMs: number, score: number, gridSize: number) => Promise<void>
+  setTotalScore: (score: number) => void
 }
 
 export const usePuzzleStore = create<PuzzleState>((set, get) => ({
@@ -23,6 +25,7 @@ export const usePuzzleStore = create<PuzzleState>((set, get) => ({
   startTime: null,
   completionMs: null,
   score: null,
+  totalScore: null,
 
   openPuzzle: (gridSize = 3) =>
     set({ isOpen: true, gridSize, pieces: generatePieces(gridSize), startTime: Date.now(), completionMs: null, score: null }),
@@ -53,10 +56,15 @@ export const usePuzzleStore = create<PuzzleState>((set, get) => ({
     const player = await import('./playerStore')
     const songId = player.usePlayerStore.getState().currentSong?.id
     if (!songId) return
-    await fetch('/api/scores', {
+    const res = await fetch('/api/scores', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ songId, completionMs, score, gridSize }),
     })
+    if (res.ok) {
+      set(state => ({ totalScore: (state.totalScore ?? 0) + score }))
+    }
   },
+
+  setTotalScore: (score) => set({ totalScore: score }),
 }))

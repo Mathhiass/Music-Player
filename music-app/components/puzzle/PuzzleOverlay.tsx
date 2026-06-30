@@ -15,19 +15,38 @@ function Cell({ row, col, artworkUrl, gridSize, pieceSize }: {
     s.pieces.find(p => p.currentRow === row && p.currentCol === col && p.isPlaced)
   )
 
+  const backgroundSize = `${gridSize * pieceSize}px ${gridSize * pieceSize}px`
+  const backgroundPosition = `-${col * pieceSize}px -${row * pieceSize}px`
+
   return (
     <div
       ref={setNodeRef}
-      className={`rounded border transition-all duration-200 ${
-        isOver ? 'border-emerald-400 bg-emerald-500/10' : 'border-zinc-800 bg-zinc-950/60'
+      className={`rounded transition-all duration-200 ${
+        isOver ? 'border-emerald-400 bg-emerald-500/20 shadow-inner' : 'border-zinc-800/40 bg-zinc-950/40'
       }`}
       style={{
         width: pieceSize,
         height: pieceSize,
         position: 'relative',
-        overflow: 'hidden',
+        overflow: 'visible',
+        border: '1px solid rgba(63, 63, 70, 0.4)',
       }}
     >
+      {!piece && (
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            backgroundImage: `url(${artworkUrl})`,
+            backgroundSize,
+            backgroundPosition,
+            opacity: 0.12,
+            filter: 'grayscale(60%)',
+            pointerEvents: 'none',
+            borderRadius: 4,
+          }}
+        />
+      )}
       {piece && (
         <PuzzlePiece piece={piece} artworkUrl={artworkUrl} pieceSize={pieceSize} gridSize={gridSize} />
       )}

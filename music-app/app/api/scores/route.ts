@@ -27,6 +27,15 @@ export async function POST(req: NextRequest) {
       },
     })
 
+    await prisma.user.update({
+      where: { id: payload.userId },
+      data: {
+        totalScore: {
+          increment: score,
+        },
+      },
+    })
+
     return NextResponse.json({ score: savedScore }, { status: 201 })
   } catch (err) {
     console.error(err)

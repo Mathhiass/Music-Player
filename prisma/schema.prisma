@@ -15,6 +15,7 @@ model User {
   playlists    Playlist[]
   library      LibrarySong[]
   scores       PuzzleScore[]
+  totalScore   Int           @default(0) @map("total_score")
 
   @@map("users")
 }
