@@ -64,14 +64,23 @@ export default function AuthPage({ defaultTab }: { defaultTab: 'login' | 'regist
         body: JSON.stringify({ email: loginEmail, password: loginPassword }),
       })
 
-      const data = await res.json()
+      let data: any = {}
+      const contentType = res.headers.get('content-type')
+      if (contentType && contentType.includes('application/json')) {
+        data = await res.json()
+      }
+
       if (!res.ok) {
-        throw new Error(data.error || 'Invalid credentials')
+        throw new Error(data.error || 'Invalid credentials. Please verify your connection.')
       }
 
       router.push('/player')
     } catch (err: any) {
-      setError(err.message)
+      if (err instanceof SyntaxError) {
+        setError('Server returned an invalid response. Please try again later.')
+      } else {
+        setError(err.message || 'An unexpected error occurred.')
+      }
     } finally {
       setLoading(false)
     }
@@ -94,14 +103,23 @@ export default function AuthPage({ defaultTab }: { defaultTab: 'login' | 'regist
         }),
       })
 
-      const data = await res.json()
+      let data: any = {}
+      const contentType = res.headers.get('content-type')
+      if (contentType && contentType.includes('application/json')) {
+        data = await res.json()
+      }
+
       if (!res.ok) {
-        throw new Error(data.error || 'Failed to register')
+        throw new Error(data.error || 'Failed to register. Please verify your details.')
       }
 
       router.push('/player')
     } catch (err: any) {
-      setError(err.message)
+      if (err instanceof SyntaxError) {
+        setError('Server returned an invalid response. Please try again later.')
+      } else {
+        setError(err.message || 'An unexpected error occurred.')
+      }
     } finally {
       setLoading(false)
     }
